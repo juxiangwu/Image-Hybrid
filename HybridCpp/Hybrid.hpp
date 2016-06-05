@@ -26,4 +26,7 @@ hybrid_recover_main();
 
 void
 hybrid_exp_main();
+
+void
+hybrid_exp_chest();
 #endif /* Hybrid_hpp */

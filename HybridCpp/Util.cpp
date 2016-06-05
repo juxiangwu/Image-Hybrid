@@ -390,9 +390,9 @@ writeBMP(const vector<vector<BYTE>>& image, const string& filePath){
     return writeBMP(filePath, image, &MY_FILE_HEADER, &MY_BMP_INFO, MY_QUAD);
 }
 
-// Calculate Standard Deviation
+// Calculate Block Standard Deviation
 static double
-calStdDeviation(const vector<vector<BYTE>>& image,
+calBlockStd(const vector<vector<BYTE>>& image,
                 const pair<int, int> rowRange,
                 const pair<int, int> colRange){
     vector<double> value;
@@ -411,6 +411,22 @@ calStdDeviation(const vector<vector<BYTE>>& image,
     return sqrt(res);
 }
 
+// Calculate Block Average
+static double
+calBlockAvg(const vector<vector<BYTE>>& image,
+            const pair<int, int> rowRange,
+            const pair<int, int> colRange){
+    vector<double> value;
+    for (int r = rowRange.first; r <= rowRange.second; r++) {
+        for (int c = colRange.first; c <= colRange.second; c++) {
+            value.push_back((double)image[r][c]);
+        }
+    }
+    double avg =
+    accumulate(value.begin(), value.end(), 0) / (double)value.size() ;
+    return avg;
+}
+
 // Block Image
 vector<int>
 blockSequence(const vector<vector<BYTE>>& image,
@@ -418,52 +434,53 @@ blockSequence(const vector<vector<BYTE>>& image,
     vector<int> res;
     int row = (int)image.size();
     int col = (int)image[0].size();
-//    int rstep = ceil(row * 1.0 / thres.blockNum);
-//    int cstep = ceil(col * 1.0 / thres.blockNum);
-    int rstep = thres.blockNum;
-    int cstep = thres.blockNum;
+    int rstep = thres.blockSize;
+    int cstep = thres.blockSize;
     int hs = 0, pe = 0;
     for(int r = 0; r < row; r += rstep){
+        int rmax = r + rstep - 1;
+        if (rmax >= row) {
+            rmax = row - 1;
+        }
         for (int c = 0; c < col; c += cstep) {
-            int rmax = r + rstep - 1;
             int cmax = c + cstep - 1;
-            if (rmax >= row) {
-                rmax = row - 1;
-            }
             if (cmax >= col) {
                 cmax = col - 1;
             }
-            double stdDev = calStdDeviation(image,
-                                            make_pair(r, rmax),
-                                            make_pair(c, cmax));
-            if (stdDev <= thres.Tdev) {
-                res.push_back(1); // HS block
-                hs++;
-            }else{
-                res.push_back(0); // PE block
+            double block_std =
+            calBlockStd(image, make_pair(r, rmax), make_pair(c, cmax));
+            if (block_std > thres.Tdev) {
+                res.push_back(0);   // PE block
                 pe++;
+            }else{
+                res.push_back(1);   // HS block
+                hs++;
             }
         }
+    }
+    for (int i = 0; i < thres.bookkeeping.size(); i++) {
+        res[thres.bookkeeping[i]] = !(res[thres.bookkeeping[i]]);
     }
     return res;
 }
 
-// Get Deviation
+
+
+// Get Block Threshold
 block_threshold
-getDeviation(const vector<vector<BYTE>>& image,
-             const vector<int>& seq,
-             block_threshold thres){
-    int cnt = (int)count(seq.begin(), seq.end(), 1);
-    vector<int> n_seq = blockSequence(image, thres);
-    while (!equal(n_seq.begin(), n_seq.end(), seq.begin())){
-        int hs = (int)count(n_seq.begin(), n_seq.end(), 1);
-        if (cnt < hs) {
-            thres.Tdev -= 0.01;
+getBlockThreshold(const vector<vector<BYTE>>& image,
+                  const vector<int>& seq,
+                  block_threshold thres){
+    int row = (int)image.size();
+    int col = (int)image[0].size();
+    int rstep = thres.blockSize;
+    int cstep = thres.blockSize;
+    int cnt = 0;
+    vector<int> new_seq = blockSequence(image, thres);
+    for (int i = 0; i < new_seq.size(); i++) {
+        if (new_seq[i] != seq[i]) {
+            thres.bookkeeping.push_back(i);
         }
-        else{
-            thres.Tdev += 0.01;
-        }
-        n_seq = blockSequence(image, thres);
-    };
+    }
     return thres;
 }

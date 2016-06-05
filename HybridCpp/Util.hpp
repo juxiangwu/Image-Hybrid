@@ -132,10 +132,10 @@ struct hs_threshold{
 // Image Blocking
 struct block_threshold{
     double Tdev;
-    int Tbl, Tbr;
-    int blockNum;
-    block_threshold(double d1, int i1, int i2, int i3):
-    Tdev(d1), Tbl(i1), Tbr(i2), blockNum(i3){};
+    int blockSize;
+    vector<int> bookkeeping;
+    block_threshold(double d1, int i1):
+    Tdev(d1), blockSize(i1){};
 };
 // Write Random Bit File
 bool
@@ -355,9 +355,8 @@ vector<int>
 blockSequence(const vector<vector<BYTE>>& image,
               const block_threshold& thres);
 
-// Get Deviation
 block_threshold
-getDeviation(const vector<vector<BYTE>>& image,
-             const vector<int>& seq,
-             block_threshold thres);
+getBlockThreshold(const vector<vector<BYTE>>& image,
+                  const vector<int>& seq,
+                  block_threshold thres);
 #endif /* Util_hpp */

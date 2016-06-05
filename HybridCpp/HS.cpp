@@ -19,11 +19,10 @@ hs_img_main(vector<vector<BYTE>> img,
     vector<BYTE> Do = data;        // Original Embedded Data
     
     cout<< "--------Embed-----------"<<endl;
-    const vector<vector<BYTE>> Iref(Io.size(), vector<BYTE>(Io[0].size(), 1));
+    const vector<vector<BYTE>> Iref(Io.size(), vector<BYTE>(Io[0].size(), 255));
     hs_threshold myThres = hs_img_embed_main(img, Iref, data, bitNum, emb_val);
     cout<< "--------End-----------"<<endl;
     // Embed Data Function
-    
     vector<vector<BYTE>> Im = img;  // Marked Image
     printf("%s: PSNR(Io,Im) = %f\n", TAG.c_str(), calPSNR(Io, Im));
     vector<vector<BYTE>> Ir = Im;   // Copy Marked Image
