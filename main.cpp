@@ -11,7 +11,6 @@
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-//    hybrid_exp_main();
     hybrid_exp_chest();
     return 0;
 }

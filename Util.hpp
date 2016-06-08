@@ -159,45 +159,6 @@ readBMP(const string& filePath);
 bool
 writeBMP(const vector<vector<BYTE>>& image, const string& filePath);
 
-// Print BMP Image Header in Console
-void
-printBMP_FILE_HEADER(const BMP_FILE_HEADER *bmp_header);
-
-// Print BMP Image Info in Console
-void
-printBMP_INFO(const BMP_INFO *bmp_info);
-
-// Print 1D Vector
-template <typename T>
-inline void
-printVector(const vector<T> vec, string tag) {
-    cout << tag << " vector: ";
-    for (size_t i = 0; i < vec.size(); i++) {
-        //        cout << "[" << i << ",";
-        //        cout << vec[i] << "]";
-        printf("[%d,%u]", i, vec[i]);
-    }
-    cout <<endl;
-}
-
-// Print 2D vector
-template <typename T>
-inline void
-printImage(const vector<vector<T>> &img, string tag){
-    cout << tag << " Image: " << endl;
-    size_t maxrow = img.size();
-    size_t maxcol = img[0].size();
-    maxrow = (maxrow < 10? maxrow: 10);
-    maxcol = (maxcol < 20? maxcol: 20);
-    for (size_t r = 0; r < maxrow; r++) {
-        cout << "Line: " << r << endl;
-        for(size_t c = 0; c < maxcol; c++){
-            printf("[%d,%d,%u]", r, c, img[r][c]);
-        }
-        printf("\n");
-    }
-}
-
 // Calculate Histogram (for PE smaller)
 template <typename T>
 inline vector<int>
@@ -230,7 +191,7 @@ calHistogram(const vector<vector<T>> &img,
 
 // Calculate Standard Histogram
 template <typename T>
-inline vector<int>
+vector<int>
 calStdHistogram(const vector<vector<T>> &img){
     size_t bit = 8; // 8 bit depth
     vector<int> hist(1 << bit, 0);
@@ -243,42 +204,14 @@ calStdHistogram(const vector<vector<T>> &img){
 }
 
 // Calculate Block Histogram
-template <typename T>
-inline vector<int>
-calBlockHistogram(const vector<vector<T>>& img,
-                const vector<vector<T>>& ref){
-    size_t bit = 8; // 8 bit depth
-    vector<int> hist(1 << bit, 0);
-    size_t row = img.size();
-    size_t col = img[0].size();
-    for (size_t r = 0; r < row; r++)
-        for (size_t c = 0; c < col; c++)
-            if (ref[r][c] == 255)
-                hist[img[r][c]]++;
-    return hist;
-}
-
-// Calculate PE Histogram
 vector<int>
-calPeHistogram(const vector<vector<BYTE>> &img);
-
-// Calculate Gery Image MSE (Mean Square Error)
-double
-calMSE(const vector<vector<BYTE>>&,
-       const vector<vector<BYTE>>&);
+calBlockHistogram(const vector<vector<BYTE>>& img,
+                  const vector<vector<BYTE>>& ref);
 
 // Calculate Grey Image PSNR
 double
 calPSNR(const vector<vector<BYTE>>&,
         const vector<vector<BYTE>>&);
-
-// Calculate Grey Image Entropy
-double
-calEntropy(const vector<vector<BYTE>>&);
-
-// Calculate Grey Image PE Entropy
-double
-calPeEntropy(const vector<int>& histo);
 
 // Convert Byte to Double Grey Image
 vector<vector<double>>

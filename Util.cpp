@@ -19,9 +19,7 @@ vector<RGB_QUAD> MY_QUAD;
 bool
 writeFile(const string& filePath,
           const size_t& bitNum){
-    /*  Write Random Bit File
-     *
-     */
+    //  Write Random Bit File
     ofstream fopen(filePath.c_str());
     if (!fopen) {
         printf("Error (writeFile): File Open Exception\n\t: %s\n",
@@ -43,10 +41,7 @@ writeFile(const string& filePath,
 vector<BYTE>
 readFile(const string& filePath,
          const size_t& bitNum){
-    /*  Read Random File
-     *
-     */
-    
+    //  Read Random File
     ifstream fin(filePath.c_str());
     vector<BYTE> res;
     if (!fin){
@@ -75,17 +70,13 @@ readBMP(const string& filePath,
         BMP_FILE_HEADER *bmpHeader,
         BMP_INFO *bmpInfo,
         vector<RGB_QUAD> &bmpQuad){
-    /*  Read Grey BMP Image from Storage
-     *
-     *
-     */
-    
+    //  Read Grey BMP Image from Storage
     const char* cPath = filePath.c_str();
     FILE *fp;
     if((fp = fopen(cPath, "rb")) == NULL)
     {
         cerr << "Error (readBMP): Cannot Open File: " << filePath << endl;
-        exit(-1);
+        return false;
     }
     fread(bmpHeader, sizeof(BMP_FILE_HEADER), 1, fp);
     fread(bmpInfo, sizeof(BMP_INFO), 1, fp);
@@ -117,10 +108,7 @@ writeBMP(const string& filePath,
          const BMP_FILE_HEADER* bmpHeader,
          const BMP_INFO* bmpInfo,
          const vector<RGB_QUAD>& bmpQuad){
-    /* Write Grey BMP Image into Storage
-     *
-     */
-    
+    // Write Grey BMP Image into Storage
     const char* cPath = filePath.c_str();
     FILE *fp;
     if ((fp = fopen(cPath, "wb")) == NULL) {
@@ -145,66 +133,23 @@ writeBMP(const string& filePath,
     return true;
 }
 
-// print BMP_FILE_HEADER
-void
-printBMP_FILE_HEADER(const BMP_FILE_HEADER *bmp_header){
-    
-    const string info = "BMP_HEADER";
-    printf("\n%s Type:\t%X\n", info.c_str(), bmp_header -> bType);
-    printf("%s Size:\t%u\n", info.c_str(), bmp_header -> bSize);
-    printf("%s Reserved 1:\t%u\n", info.c_str(), bmp_header -> bReserved1);
-    printf("%s Reserved 2:\t%u\n", info.c_str(), bmp_header -> bReserved2);
-    printf("%s Offset:\t%u\n", info.c_str(), bmp_header -> bOffset);
-}
-
-// print BMP_INFO
-void
-printBMP_INFO(const BMP_INFO *bmp_info){
-    
-    const string info = "BMP_INFO";
-    printf("\n%s Info Size:\t%u\n", info.c_str(), bmp_info -> bInfoSize);
-    printf("%s Width:\t%u\n", info.c_str(), bmp_info -> bWidth);
-    printf("%s Height:\t%u\n", info.c_str(), bmp_info -> bHeight);
-    printf("%s Planes Per Pixel:\t%u\n", info.c_str(), bmp_info -> bPlanes);
-    printf("%s Bit Per Pixel:\t%u\n", info.c_str(), bmp_info -> bBitCount);
-    printf("%s Compression:\t%u\n", info.c_str(), bmp_info -> bCompression);
-    printf("%s Image Size(Byte):\t%u\n", info.c_str(), bmp_info -> bmpImageSize);
-    printf("%s X Pels Per Meter:\t%u\n", info.c_str(), bmp_info -> bXPelsPerMeter);
-    printf("%s Y Pels Per Meter:\t%u\n", info.c_str(), bmp_info -> bYPelsPerMeter);
-    printf("%s Color Used:\t%u\n", info.c_str(), bmp_info -> bClrUsed);
-    printf("%s Color Important:\t%u\n", info.c_str(), bmp_info -> bClrImportant);
-}
-
-// Calculate PE Histogram
+// Calculate Block Histogram
 vector<int>
-calPeHistogram(const vector<vector<BYTE>> &img){
-    size_t bit = 5;
-    int cnt_lvl = (1 << bit) + 1;
-    vector<int> hist(cnt_lvl, 0);
+calBlockHistogram(const vector<vector<BYTE>>& img,
+                  const vector<vector<BYTE>>& ref){
+    size_t bit = 8; // 8 bit depth
+    vector<int> hist(1 << bit, 0);
     size_t row = img.size();
     size_t col = img[0].size();
-    vector<int> B = {1, 2, 1, 2, 0, 2, 1, 2, 1};
-    int C = accumulate(B.begin(), B.end(), 0);
-    for (size_t r = 1; r < row - 1; r++) {
-        for (size_t c= 1; c < col - 1; c++) {
-            int curAvg = 0, num = 0;
-            for (size_t i = r - 1; i <= r + 1; i++)
-                for (size_t j = c - 1; j <= c + 1; j++)
-                    curAvg += img[i][j] * B[num++];
-            curAvg /= C;
-            int curPe = img[r][c] - curAvg;
-            if (curPe >=  -(cnt_lvl >> 1) &&
-                curPe <= (cnt_lvl >> 1)) {
-                hist[curPe + (cnt_lvl >> 1)]++;
-            }
-            
-        }
-    }
+    for (size_t r = 0; r < row; r++)
+        for (size_t c = 0; c < col; c++)
+            if (ref[r][c] == 255)
+                hist[img[r][c]]++;
     return hist;
 }
 
 // Calculate Gery Image MSE (Mean Square Error)
-double
+static double
 calMSE(const vector<vector<BYTE>>& img1,
        const vector<vector<BYTE>>& img2){
     
@@ -235,85 +180,6 @@ calPSNR(const vector<vector<BYTE>>& img1,
     double myPsnr = 0.0;
     myPsnr = 10 * log10(pow(255.0, 2.0) / calMSE(img1, img2));
     return myPsnr;
-}
-
-// Calculate Grey Image Entropy
-double
-calEntropy(const vector<vector<BYTE>>& img){
-    
-    double myEntropy = 0.0;
-    vector<int> hist = calHistogram(img);
-    double pixelNum = accumulate(hist.begin(), hist.end(), 0);
-    for (size_t i = 0; i < hist.size(); i++) {
-        
-        double temp = hist[i] / pixelNum;
-        temp = temp * log2(temp);
-        if (isnan(temp)) {
-            temp = 0;
-        }
-        myEntropy += temp;
-    }
-    return -1.0 * myEntropy;
-}
-
-// Calculate Grey Image PE Entropy
-double
-calPeEntropy(const vector<int>& hist){
-    double myEntropy = 0.0;
-    double pixelNum = accumulate(hist.begin(), hist.end(), 0);
-    for (size_t i = 0; i < hist.size(); i++) {
-        
-        double temp = hist[i] / pixelNum;
-        temp = temp * log2(temp);
-        if (isnan(temp)) {
-            temp = 0;
-        }
-        myEntropy += temp;
-    }
-    return -1.0 * myEntropy;
-}
-
-// Byte -> Double
-vector<vector<double>>
-byte2Double(const vector<vector<BYTE>>& img){
-    
-    size_t row = img.size();
-    size_t col = img[0].size();
-    vector<vector<double>> res;
-    for (size_t i = 0; i < row; i++) {
-        vector<double> temp;
-        for (size_t j = 0; j < col; j++) {
-            temp.push_back(img[i][j]);
-        }
-        res.push_back(temp);
-    }
-    return res;
-}
-
-// Double -> Byte
-vector<vector<BYTE>>
-double2Byte(const vector<vector<double>>& img){
-    
-    size_t row = img.size();
-    size_t col = img[0].size();
-    vector<vector<BYTE>> res;
-    for (size_t i = 0; i < row; i++) {
-        vector<BYTE> temp;
-        for (size_t j = 0; j < col; j++) {
-            double p = img[i][j];
-            if (p > 0xff){
-                continue;
-                //                printf("Warning (Double2Byte): Could Cause Overflow!\n");
-            }
-            else if (p < 0){
-                continue;
-                //                printf("Warning (Double2Byte): Could Cause Underflow!\n");
-            }
-            temp.push_back(BYTE(p));
-        }
-        res.push_back(temp);
-    }
-    return res;
 }
 
 // Byte -> Int
@@ -411,22 +277,6 @@ calBlockStd(const vector<vector<BYTE>>& image,
     return sqrt(res);
 }
 
-// Calculate Block Average
-static double
-calBlockAvg(const vector<vector<BYTE>>& image,
-            const pair<int, int> rowRange,
-            const pair<int, int> colRange){
-    vector<double> value;
-    for (int r = rowRange.first; r <= rowRange.second; r++) {
-        for (int c = colRange.first; c <= colRange.second; c++) {
-            value.push_back((double)image[r][c]);
-        }
-    }
-    double avg =
-    accumulate(value.begin(), value.end(), 0) / (double)value.size() ;
-    return avg;
-}
-
 // Block Image
 vector<int>
 blockSequence(const vector<vector<BYTE>>& image,
@@ -464,18 +314,11 @@ blockSequence(const vector<vector<BYTE>>& image,
     return res;
 }
 
-
-
 // Get Block Threshold
 block_threshold
 getBlockThreshold(const vector<vector<BYTE>>& image,
                   const vector<int>& seq,
                   block_threshold thres){
-    int row = (int)image.size();
-    int col = (int)image[0].size();
-    int rstep = thres.blockSize;
-    int cstep = thres.blockSize;
-    int cnt = 0;
     vector<int> new_seq = blockSequence(image, thres);
     for (int i = 0; i < new_seq.size(); i++) {
         if (new_seq[i] != seq[i]) {

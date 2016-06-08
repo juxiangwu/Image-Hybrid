@@ -13,6 +13,7 @@ refer_image(const vector<vector<BYTE>>& image,
             const vector<int> seq,
             const int blockSize){
     
+    const string TAG = "refer_image";
     int row = (int)image.size();
     int col = (int)image[0].size();
     int rstep = blockSize;
@@ -21,23 +22,27 @@ refer_image(const vector<vector<BYTE>>& image,
     vector<vector<BYTE>> res(row, vector<BYTE>(col, 127));
     for(int r = 0; r < row; r += rstep){
         for (int c = 0; c < col; c += cstep) {
-            cnt++;
             for (int i = r; i < row && i < r + rstep; i++) {
                 for (int j = c; j < col && j < c + cstep; j++) {
                     if (seq[cnt] == 1) {
                         res[i][j] = 255;    // HS region
-                    }else{
+                    }
+                    else if(seq[cnt] == 0){
                         res[i][j] = 0;      // PE region
+                    }
+                    else{
+                        printf("Error %s: get I ref error. %d\n", TAG.c_str(), seq[cnt]);
                     }
                 }
             }
+            cnt++;
         }
     }
     return res;
 }
 
 static void
-vector_equal(vector<int> vec1, vector<int> vec2){
+equal_vector(vector<int> vec1, vector<int> vec2){
     if (vec1.size() != vec2.size()) {
         printf("vector NOT EQUAL: vec1.size() = %lu, vec2.size() = %lu\n", vec1.size(), vec2.size());
     }
@@ -62,7 +67,6 @@ hybrid_embed(const int bits,
     // Block
     vector<int> seq = blockSequence(IMG, b_thres);
     const vector<vector<BYTE>> Iref = refer_image(IMG, seq, b_thres.blockSize);
-    writeBMP(Iref, SrcDir + "block.bmp");
     int hs_bits = hs_img_embed_bits(calBlockHistogram(IMG, Iref), emb_val);
     hs_bits = (hs_bits > bits? bits: hs_bits);
     vector<BYTE> D_hs(Do.begin(), Do.begin() + hs_bits);
@@ -95,7 +99,7 @@ hybrid_recover(vector<vector<BYTE>> &IMG,
     vector<int> seq_r = blockSequence(IMG, b_thres);
     vector<vector<BYTE>> Iref_r = refer_image(IMG, seq_r, b_thres.blockSize);
     // Debug
-    vector_equal(seq, seq_r);
+    equal_vector(seq, seq_r);
     printf("%s: PSNR[Iref, Iref_r] = %2.2f\n", TAG.c_str(), calPSNR(Iref, Iref_r));
     printf("%s: BIT PE = %d, HS = %d\n",
            TAG.c_str(), pe_thres.totalBit, hs_thres.totalBit);
