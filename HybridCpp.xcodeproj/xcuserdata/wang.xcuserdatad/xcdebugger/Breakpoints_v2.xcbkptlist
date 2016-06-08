@@ -24,43 +24,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HybridCpp/Util.cpp"
-            timestampString = "486375828.358198"
+            timestampString = "486715111.73747"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "411"
-            endingLineNumber = "411"
-            landmarkName = "calStdDeviation(const vector&lt;vector&lt;BYTE&gt;&gt;&amp; image, const pair&lt;int, int&gt; rowRange, const pair&lt;int, int&gt; colRange)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "HybridCpp/Util.cpp"
-            timestampString = "486375828.358198"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "406"
-            endingLineNumber = "406"
-            landmarkName = "calStdDeviation(const vector&lt;vector&lt;BYTE&gt;&gt;&amp; image, const pair&lt;int, int&gt; rowRange, const pair&lt;int, int&gt; colRange)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "HybridCpp/Util.cpp"
-            timestampString = "486530935.726771"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "437"
-            endingLineNumber = "437"
+            startingLineNumber = "451"
+            endingLineNumber = "451"
             landmarkName = "blockSequence(const vector&lt;vector&lt;BYTE&gt;&gt;&amp; image, const block_threshold&amp; thres)"
             landmarkType = "7">
          </BreakpointContent>
@@ -72,27 +40,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "HybridCpp/Hybrid.cpp"
-            timestampString = "486530935.726771"
+            timestampString = "487049443.467374"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
-            landmarkName = "hybrid_main(double bpp, vector&lt;vector&lt;BYTE&gt;&gt; IMG, block_threshold b_thres, pe_threshold pe_thres, vector&lt;pair&lt;int, int&gt;&gt; emb_val)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "HybridCpp/Hybrid.cpp"
-            timestampString = "486531708.771949"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
+            startingLineNumber = "138"
+            endingLineNumber = "138"
             landmarkName = "hybrid_main(double bpp, vector&lt;vector&lt;BYTE&gt;&gt; IMG, block_threshold b_thres, pe_threshold pe_thres, vector&lt;pair&lt;int, int&gt;&gt; emb_val)"
             landmarkType = "7">
          </BreakpointContent>

@@ -236,7 +236,10 @@ hs_img_recover_main(vector<vector<BYTE>> &img,
     const string TAG = "hs_img_recover_main";
     
     while (data_re.size() < thres.totalBit) {
-        
+        printf("%s:[data_re.size = %d, thres.totalBit = %d]\n ",
+               TAG.c_str(),
+               data_re.size(),
+               thres.totalBit);
         vector<BYTE> record;    // recover record in current round
         vector<BYTE> mydata_re; // recover data in current round
         hs_img_recover_round(img, ref, mydata_re, record, thres);

@@ -20,14 +20,6 @@ ostream&
 operator<<(ostream& out,
            const pe_val_bit &obj);
 
-
-//// Prediction Error Method
-//bool
-//pe_img_main(vector<vector<BYTE>> img,
-//            const vector<vector<BYTE>> ref;
-//            vector<BYTE> data,
-//            int bitNum);
-
 // Embed Data into Image
 bool
 pe_img_embed_main(vector<vector<BYTE>> &img,

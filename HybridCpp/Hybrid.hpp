@@ -22,11 +22,5 @@ hybrid_main(double bpp,
                   vector<pair<int, int>>);
 
 void
-hybrid_recover_main();
-
-void
-hybrid_exp_main();
-
-void
 hybrid_exp_chest();
 #endif /* Hybrid_hpp */
