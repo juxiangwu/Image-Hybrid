@@ -102,10 +102,10 @@ struct pe_threshold{
         return totalBit != -888;
     }
     void print(string str = "pe_threshold"){
-        printf("%s: T=%d,TF=%d,TL=%d,TR=%d,\n\tS=%d,P=%d,circle=%d,bitNum=%d\n",
-               str.c_str(), T, TF, TL, TR, S, P, circle, totalBit);
-        //        printVector(bookkeeping_left, str + " bkp_l");
-        //        printVector(bookkeeping_right, str + " bkp_r");
+        printf("%s: [T, TF, TL, TR] = [%d, %d, %d, %d]\n",
+               str.c_str(), T, TF, TL, TR);
+        printf("%s: [S, P, circle, BitNum] = [%d, %d, %d, %d]\n",
+               str.c_str(), S, P, circle, totalBit);
     }
 };
 

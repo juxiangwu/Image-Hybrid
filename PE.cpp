@@ -35,10 +35,10 @@ pe_img_embed_main(vector<vector<BYTE>> &img,
         return false;
     }
     thres.print(TAG);
-    printf("%s: hist(min)=%d,hist(max)=%d, \n\t len(Record)=%lu, len(Data)=%lu\n",
-           TAG.c_str(),
-           minValue(I), maxValue(I),
-           data_re.size(), data_emb.size());
+    printf("%s: hist[Min, Max] = [%d, %d] \n",
+           TAG.c_str(), minValue(I), maxValue(I));
+    printf("%s: len[Record, Data] = [%lu, %lu]\n",
+           TAG.c_str(), data_re.size(), data_emb.size());
     if (maxValue(I) > 255 || minValue(I) < 0) {
         printf("Error (%s): Underflow or Overflow!!!\n", TAG.c_str());
         return false;

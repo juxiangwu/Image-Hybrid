@@ -45,7 +45,7 @@ hs_img_embed_main(vector<vector<BYTE>> &img,
     // Get bitNum bits data
     string TAG = "hs_img_embed_main";
     vector<BYTE> myData(data.begin(), data.begin() + bitNum);// Get Embed Data
-    cout<< TAG <<": Bit="<<bitNum <<endl;
+    cout<< TAG <<": Bit = "<<bitNum <<endl;
     hs_threshold myThres;   // Initial Threshold
     myThres.totalBit = bitNum;
     
@@ -68,12 +68,10 @@ hs_img_embed_main(vector<vector<BYTE>> &img,
         hs_img_embed_round(img, ref, myData, myRecord, myThres);
         // Embed Data
         cnt--;
-        printf("%s:[Peak=%d,Zero=%d,BitNum=%d,Book=%d]\n", TAG.c_str(),
-               myThres.peakPoint.back(),
-               myThres.zeroPoint.back(),
-               myThres.bitNum.back(),
-               myThres.bookkeeping.back()
-               );
+        printf("%s: [Peak, Zero, BitNum, Book] = [%d, %d, %d, %d]\n",
+               TAG.c_str(),
+               myThres.peakPoint.back(), myThres.zeroPoint.back(),
+               myThres.bitNum.back(), myThres.bookkeeping.back());
     }
     return myThres;
 }
@@ -236,7 +234,7 @@ hs_img_recover_main(vector<vector<BYTE>> &img,
     const string TAG = "hs_img_recover_main";
     
     while (data_re.size() < thres.totalBit) {
-        printf("%s:[data_re.size = %d, thres.totalBit = %d]\n ",
+        printf("%s:[data_re.size, thres.totalBit] = [%lu, %d]\n",
                TAG.c_str(),
                data_re.size(),
                thres.totalBit);
@@ -250,7 +248,7 @@ hs_img_recover_main(vector<vector<BYTE>> &img,
         thres.zeroPoint.pop_back();
         thres.bitNum.pop_back();
         thres.bookkeeping.pop_back();
-        printf("%s:[TotalBit=%d,Record=%lu,MydataRe=%lu]\n",
+        printf("%s:[BitNum, Book, Data] = [%d, %lu, %lu]\n",
                TAG.c_str(),
                thres.totalBit,
                record.size(),

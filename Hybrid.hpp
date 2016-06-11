@@ -20,6 +20,8 @@ hybrid_main(double bpp,
                   block_threshold b_thres,
                   pe_threshold pe_thres,
                   vector<pair<int, int>>);
+void
+hybrid_exp_main();
 
 void
 hybrid_exp_chest();

@@ -42,7 +42,7 @@ refer_image(const vector<vector<BYTE>>& image,
 }
 
 static void
-equal_vector(vector<int> vec1, vector<int> vec2){
+equal_vector(vector<int> vec1, vector<int> vec2, const string TAG){
     if (vec1.size() != vec2.size()) {
         printf("vector NOT EQUAL: vec1.size() = %lu, vec2.size() = %lu\n", vec1.size(), vec2.size());
     }
@@ -53,7 +53,7 @@ equal_vector(vector<int> vec1, vector<int> vec2){
             res = false;
         }
     }
-    printf("vector %s\n", res?"EQUAL":"NOT EQUAL");
+    printf("%s: vector %s\n", TAG.c_str(), res?"EQUAL":"NOT EQUAL");
 }
 
 static bool
@@ -91,18 +91,11 @@ hybrid_recover(vector<vector<BYTE>> &IMG,
                vector<BYTE> &Dr,
                block_threshold b_thres,
                pe_threshold pe_thres,
-               hs_threshold hs_thres,
-               vector<int> seq,
-               vector<vector<BYTE>> Iref){
+               hs_threshold hs_thres){
     const string TAG = "hybrid_recover";
     // Recover Seq_r & Iref_r
     vector<int> seq_r = blockSequence(IMG, b_thres);
     vector<vector<BYTE>> Iref_r = refer_image(IMG, seq_r, b_thres.blockSize);
-    // Debug
-    equal_vector(seq, seq_r);
-    printf("%s: PSNR[Iref, Iref_r] = %2.2f\n", TAG.c_str(), calPSNR(Iref, Iref_r));
-    printf("%s: BIT PE = %d, HS = %d\n",
-           TAG.c_str(), pe_thres.totalBit, hs_thres.totalBit);
     // PE Recover
     vector<BYTE> Dr_pe, Dr_hs;
     if (pe_thres.totalBit != 0) {
@@ -119,6 +112,28 @@ hybrid_recover(vector<vector<BYTE>> &IMG,
     return true;
 }
 
+static bool
+hybrid_isReversible(const vector<vector<BYTE>>& img1, const vector<vector<BYTE>>& img2,
+             const vector<BYTE>& data1, const vector<BYTE>& data2){
+    const string TAG = "hybrid_isReversible";
+    bool check = true;
+    double psnr2 = calPSNR(img1, img2);
+    bool isData = equal(data1.begin(), data1.end(), data2.begin());
+    
+    if (psnr2 != INFINITY) {
+        check = false;
+    }
+    if (! isData) {
+        check = false;
+    }
+    printf("%s: %s, [PSNR, DATA] = [%f, %s]\n",
+           TAG.c_str(),
+           check ? "CORRECT": "ERROR!!!",
+           psnr2,
+           isData ? "True": "False");
+    return check;
+}
+
 double
 hybrid_main(double bpp,
             vector<vector<BYTE>> IMG,
@@ -133,43 +148,26 @@ hybrid_main(double bpp,
     vector<BYTE> Do = readFile(DataPath, bits), Dr;
     vector<vector<BYTE>> Io(IMG);
     hs_threshold hs_thres;
-    // Debug
+    // Blocking Image
     vector<int> seq = blockSequence(IMG, b_thres);
     vector<vector<BYTE>> Iref = refer_image(IMG, seq, b_thres.blockSize);
     // Embed
     hybrid_embed(bits, IMG, Do, emb_val, b_thres, pe_thres, hs_thres);
     // PSNR
     double psnr1 = calPSNR(IMG, Io);
-    printf("PSNR[Io,Im] = %2.2f (dB)\n", psnr1);
+    printf("%s: PSNR[Io,Im] = %2.2f (dB)\n", TAG.c_str(), psnr1);
     // Recover
-    hybrid_recover(IMG, Dr, b_thres, pe_thres, hs_thres, seq, Iref);
+    hybrid_recover(IMG, Dr, b_thres, pe_thres, hs_thres);
     // Check Reversible
-    bool check = true;
-    double psnr2 = calPSNR(IMG, Io);
-    printf("PSNR[Ir,Io] = %2.2f (dB), ", psnr2);
-    if (psnr2 != INFINITY) {
-        check = false;
-    }
-    if (equal(Do.begin(), Do.end(), Dr.begin())) {
-        printf("Data: True\n");
-    }else{
-        printf("Data: False\n");
-        check = false;
-    }
-    
-    if (check) {
-        printf("CORRECT\n");
-        return psnr1;
-    }else{
-        printf("ERROR\n");
-        return -1;
-    }
+    bool isReversible = hybrid_isReversible(Io, IMG, Do, Dr);
+    return isReversible ? psnr1: -1.0;
 }
 
 void
 hybrid_exp_main(){
+    const string TAG = "hybrid_exp_main";
     const int Idx = 2;                      // image index
-    const double c_bpp = 0.01;
+    const double c_bpp = 0.4;
     const int c_step = 10;
     vector<vector<BYTE>> img = readBMP(SrcDir + GreyImg[Idx]);
     cout << GreyImg[Idx] << endl;
@@ -177,16 +175,16 @@ hybrid_exp_main(){
     vector<pe_threshold> pe_thres;          // PE Threshold
     for (int i = 0; i < c_step; i++) {
         pe_thres.push_back(pe_threshold(0,  // pe embed bit
-                                        -3,  // T
-                                        linspace(240, 250)[i],// TF
-                                        3,  // TL
-                                        1   // TR
+                                        1,  // T
+                                        linspace(10, 250)[i],// TF
+                                        2,  // TL
+                                        0   // TR
                                         ));
     }
     vector<pair<int, int>> emb_val;         // HS Threshold
     emb_val.push_back(make_pair(0, 2));
     int bestIdx = -1.0;
-    double bestPSNR = -1;
+    double bestPSNR = -1.0;
     for (int i = 0; i < c_step; i++) {
         printf("No. %d\n", i);
         double psnr = hybrid_main(c_bpp, img, b_thres, pe_thres[i], emb_val);
